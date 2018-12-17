@@ -1,7 +1,10 @@
 # vue-layout
 
 > A Vue.js project
+vue实现类似easyui-layout布局，可拖拽，可伸缩。
+![Image message](Animation.gif)
 
+![Image message](Animation2.gif)
 ## Build Setup
 
 ``` bash

@@ -2,7 +2,7 @@
   <div id="app">
       <!-- 左侧伸缩部分 -->
       <transition name='left'>
-         <div v-show='leftshow' id='leftDiv' class='layout-left'>
+         <div v-show='leftshow' id='leftDiv' class='layout-left' :style='{marginLeft:leftDomMargin, width:leftDomWidth}'>
           this is in leftDiv
          </div>
       </transition>
@@ -14,11 +14,11 @@
           </div>
       </div>
       <!-- 添加拖动代理div -->
-      <div id='proxyDiv' class='layout-proxy' @mousedown.prevent='dragStart'>
+      <div id='proxyDiv' class='layout-proxy' @mousedown.prevent='dragStart' :style='{left:proxyDomLeft}'>
         
       </div>
       <!-- 中间内容部分 -->
-      <div id='centerDiv' class='layout-center'>
+      <div id='centerDiv' class='layout-center' :style='{width:centerDomWid}'>
         this is in centerDiv
       </div>
   </div>
@@ -32,25 +32,27 @@ export default {
       return{
         leftshow:true,
         layoutX:200,
+        leftDomMargin:'0px',
+        leftDomWidth:'200px',
+        centerDomWid:'calc(100% - 20px -200px)',
+        proxyDomLeft:'200px',
+
       }
   },
   methods:{
     /*左侧伸缩隐藏*/
     slide(){
       this.leftshow = !this.leftshow;
-      let proxyDom = document.querySelector('#proxyDiv');
-      let leftDom = document.querySelector('#leftDiv');
-      let centerDom = document.querySelector('#centerDiv');
       let that = this;
         if(!this.leftshow){ //隐藏左侧div
-          proxyDom.style.left = -that.layoutX + 'px';
-          leftDom.style.marginLeft = -that.layoutX + 'px';
-          centerDom.style.width = 'calc(100% - 20px)';
+          that.proxyDomLeft = -that.layoutX + 'px';
+          that.leftDomMargin = -that.layoutX + 'px';
+          that.centerDomWid = 'calc(100% - 20px)';
         }else{
           setTimeout(function(){
-            proxyDom.style.left = that.layoutX + 'px';
-            leftDom.style.marginLeft = '0px';
-            centerDom.style.width = 'calc(100% - 20px - '+that.layoutX+'px)';
+            that.proxyDomLeft = that.layoutX + 'px';
+            that.leftDomMargin = '0px';
+            that.centerDomWid = 'calc(100% - 20px - '+that.layoutX+'px)';
           },30)
           
         }
@@ -58,18 +60,17 @@ export default {
     /*拖拽*/
     dragStart(e){
         let that = this;//保存this到that
-        let leftDom = document.querySelector('#leftDiv');
-        let centerDom = document.querySelector('#centerDiv');
         e.target.style.opacity = .8;
         /*当鼠标在拖动div按下时绑定鼠标移动事件*/
         document.onmousemove = function(event){
-            e.target.style.left = event.clientX + 'px'; //拖动时更改代理div的位置，跟随鼠标运动
+           that.proxyDomLeft = event.clientX + 'px';
+         //拖动时更改代理div的位置，跟随鼠标运动
         }
         document.onmouseup = function(event){
           that.layoutX = event.clientX; //保存鼠标抬起的位置，
           e.target.style.opacity = 0; //代理div不可见
-          leftDom.style.width = event.clientX + 'px';
-          centerDom.style.width = 'calc(100% - 20px - '+event.clientX+'px)';
+          that.leftDomWidth = event.clientX + 'px';
+          that.centerDomWid = 'calc(100% - 20px - '+event.clientX+'px)';
           //还原事件
           document.onmousemove = null;
           document.onmouseup = null;
